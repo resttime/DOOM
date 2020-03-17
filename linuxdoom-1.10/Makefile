@@ -7,11 +7,12 @@
 CC=  gcc  # gcc or g++
 
 CFLAGS=-g -Wall -DNORMALUNIX -DLINUX # -DUSEASM 
-LDFLAGS=-L/usr/X11R6/lib
+LDFLAGS=-L/usr/X11R6/lib64
 LIBS=-lXext -lX11 -lnsl -lm
 
 # subdirectory for objects
 O=linux
+build_folder := $(shell mkdir -p $(O))
 
 # not too sophisticated dependency
 OBJS=				\
