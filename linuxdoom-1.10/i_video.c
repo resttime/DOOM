@@ -53,17 +53,17 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #define POINTER_WARP_COUNTDOWN	1
 
-Display*	X_display=0;
-Window		X_mainWindow;
-Colormap	X_cmap;
-Visual*		X_visual;
-GC		X_gc;
-XEvent		X_event;
-int		X_screen;
-XVisualInfo	X_visualinfo;
-XImage*		image;
-int		X_width;
-int		X_height;
+// Display*	X_display=0;
+// Window		X_mainWindow;
+// Colormap	X_cmap;
+// Visual*		X_visual;
+// GC		X_gc;
+// XEvent		X_event;
+// int		X_screen;
+// XVisualInfo	X_visualinfo;
+// XImage*		image;
+// int		X_width;
+// int		X_height;
 
 // Fake mouse handling.
 // This cannot work properly w/o DGA.
