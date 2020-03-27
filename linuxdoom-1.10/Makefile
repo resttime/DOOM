@@ -9,7 +9,7 @@ CC=  gcc  # gcc or g++
 CFLAGS=-g -Wall -DNORMALUNIX -DLINUX # -DUSEASM 
 INC=-I/usr/include/SDL2
 LDFLAGS=-L/usr/X11R6/lib64
-LIBS=-lXext -lX11 -lnsl -lm -lSDL
+LIBS=-lXext -lX11 -lnsl -lm -lSDL2
 
 # subdirectory for objects
 O=linux
