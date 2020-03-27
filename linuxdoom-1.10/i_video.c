@@ -508,8 +508,39 @@ void I_SetPalette (byte* palette)
     UploadNewPalette(X_cmap, palette);
 }
 
+
+// SDL2
+void I_InitSdl(void)
+{
+    SDL_Init(SDL_INIT_VIDEO);
+
+    SDL_Window *window;
+    window = SDL_CreateWindow(
+        "An SDL2 window",                  // window title
+        SDL_WINDOWPOS_UNDEFINED,           // initial x position
+        SDL_WINDOWPOS_UNDEFINED,           // initial y position
+        640,                               // width, in pixels
+        480,                               // height, in pixels
+        SDL_WINDOW_OPENGL                  // flags - see below
+        );
+    if (window == NULL) {
+        I_Error("Could not create SDL2 window");
+    }
+    // The window is open: could enter program loop here (see SDL_PollEvent())
+
+    SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
+
+    // Close and destroy the window
+    SDL_DestroyWindow(window);
+
+    // Clean up
+    SDL_Quit();
+
+}
+
 void I_InitGraphics(void)
 {
+    I_InitSdl();
 
     char*		displayname;
     char*		d;
