@@ -541,11 +541,11 @@ void I_InitGraphics(void)
 {
     // Flag whether this function has been run already since we only
     // want to initialize graphics once
-    static int firsttime=1;
+    static boolean firsttime = true;
     if (!firsttime) {
         return;
     }
-    firsttime = 0;
+    firsttime = false;
 
     // Intialize the SDL
     I_InitSdl();
