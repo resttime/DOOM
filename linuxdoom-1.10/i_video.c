@@ -591,7 +591,7 @@ void I_InitGraphics(void)
 
     // grabs the pointer so it is restricted to this window
     if (grabMouse) {
-        SDL_SetWindowGrab(window, SDL_TRUE)
+        SDL_SetWindowGrab(window, SDL_TRUE);
     }
 
     // create renderer to render context of the window
