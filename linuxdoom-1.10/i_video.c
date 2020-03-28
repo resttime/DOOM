@@ -624,24 +624,20 @@ void I_InitGraphics(void)
     if (window == NULL) {
         I_Error("Could not create SDL2 window");
     }
-    SDL_ShowCursor(SDL_DISABLE);
 
+    // hide the cursor
+    SDL_ShowCursor(SDL_DISABLE);
 
     // grabs the pointer so it is restricted to this window
     if (grabMouse) {
         SDL_SetWindowGrab(window, SDL_TRUE)
     }
 
-	image = XCreateImage(	X_display,
-    				X_visual,
-    				8,
-    				ZPixmap,
-    				0,
-    				(char*)malloc(X_width * X_height),
-    				X_width, X_height,
-    				8,
-    				X_width );
+    // create renderer to render context of the window
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
+    // create surface for image data
+    SDL_Surface* surface = SDL_CreateRGBSurface(0, r_width, r_height, 8, 0, 0, 0, 0);
 
     if (multiply == 1) {
         screens[0] = (unsigned char *) (image->data);
