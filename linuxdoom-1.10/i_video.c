@@ -535,107 +535,106 @@ void I_InitSdl(void)
 
     // Clean up
     SDL_Quit();
-
 }
 
 void I_InitGraphics(void)
 {
-    I_InitSdl();
-
-    char*		displayname;
-    char*		d;
-    int			n;
-    int			pnum;
-    int			x=0;
-    int			y=0;
-    
-    // warning: char format, different type arg
-    char		xsign=' ';
-    char		ysign=' ';
-    
-    int			oktodraw;
-    unsigned long	attribmask;
-    XSetWindowAttributes attribs;
-    XGCValues		xgcvalues;
-    int			valuemask;
-    static int		firsttime=1;
-
-    if (!firsttime)
-	return;
+    // Flag whether this function has been run already since we only
+    // want to initialize graphics once
+    static int firsttime=1;
+    if (!firsttime) {
+        return;
+    }
     firsttime = 0;
 
+    // Intialize the SDL
+    I_InitSdl();
+
+    // Set the interrupt signal to quit
     signal(SIGINT, (void (*)(int)) I_Quit);
 
-    if (M_CheckParm("-2"))
-	multiply = 2;
-
-    if (M_CheckParm("-3"))
-	multiply = 3;
-
-    if (M_CheckParm("-4"))
-	multiply = 4;
-
-    X_width = SCREENWIDTH * multiply;
-    X_height = SCREENHEIGHT * multiply;
+    // Check for command line argument for resolution multiplier
+    if (M_CheckParm("-2")) {
+        multiply = 2;
+    }
+    if (M_CheckParm("-3")) {
+        multiply = 3;
+    }
+    if (M_CheckParm("-4")) {
+        multiply = 4;
+    }
 
     // check for command-line display name
-    if ( (pnum=M_CheckParm("-disp")) ) // suggest parentheses around assignment
-	displayname = myargv[pnum+1];
-    else
-	displayname = 0;
+    int			pnum;
+    char*		displayname;
+    if ( (pnum=M_CheckParm("-disp")) ) { // suggest parentheses around assignment
+        displayname = myargv[pnum+1];
+    } else {
+        displayname = 0;
+    }
 
     // check if the user wants to grab the mouse (quite unnice)
     grabMouse = !!M_CheckParm("-grabmouse");
 
     // check for command-line geometry
-    if ( (pnum=M_CheckParm("-geom")) ) // suggest parentheses around assignment
-    {
-	// warning: char format, different type arg 3,5
-	n = sscanf(myargv[pnum+1], "%c%d%c%d", &xsign, &x, &ysign, &y);
-	
-	if (n==2)
-	    x = y = 0;
-	else if (n==6)
-	{
-	    if (xsign == '-')
-		x = -x;
-	    if (ysign == '-')
-		y = -y;
-	}
-	else
-	    I_Error("bad -geom parameter");
+    int			x=0;
+    int			y=0;
+    if ( (pnum=M_CheckParm("-geom")) ) { // suggest parentheses around assignment
+        int			n;
+        // warning: char format, different type arg
+        char		xsign=' ';
+        char		ysign=' ';
+        // warning: char format, different type arg 3,5
+        n = sscanf(myargv[pnum+1], "%c%d%c%d", &xsign, &x, &ysign, &y);
+    
+        if (n==2) {
+            x = y = 0;
+        }
+        else if (n==6) {
+            if (xsign == '-') x = -x;
+            if (ysign == '-') y = -y;
+        } else {
+            I_Error("bad -geom parameter");
+        }
     }
 
     // open the display
     X_display = XOpenDisplay(displayname);
-    if (!X_display)
-    {
-	if (displayname)
-	    I_Error("Could not open display [%s]", displayname);
-	else
-	    I_Error("Could not open display (DISPLAY=[%s])", getenv("DISPLAY"));
+    if (!X_display) {
+        if (displayname) {
+            I_Error("Could not open display [%s]", displayname);
+        } else {
+            I_Error("Could not open display (DISPLAY=[%s])", getenv("DISPLAY"));
+        }
     }
 
     // use the default visual 
     X_screen = DefaultScreen(X_display);
-    if (!XMatchVisualInfo(X_display, X_screen, 8, PseudoColor, &X_visualinfo))
-	I_Error("xdoom currently only supports 256-color PseudoColor screens");
+    if (!XMatchVisualInfo(X_display, X_screen, 8, PseudoColor, &X_visualinfo)) {
+        I_Error("xdoom currently only supports 256-color PseudoColor screens");
+    }
     X_visual = X_visualinfo.visual;
 
     // create the colormap
-    X_cmap = XCreateColormap(X_display, RootWindow(X_display,
-						   X_screen), X_visual, AllocAll);
+    X_cmap = XCreateColormap(X_display, RootWindow(X_display, X_screen),
+                             X_visual, AllocAll);
 
     // setup attributes for main window
+    unsigned long	attribmask;
     attribmask = CWEventMask | CWColormap | CWBorderPixel;
+
+    XSetWindowAttributes attribs;
     attribs.event_mask =
-	KeyPressMask
-	| KeyReleaseMask
-	// | PointerMotionMask | ButtonPressMask | ButtonReleaseMask
-	| ExposureMask;
+        KeyPressMask
+        | KeyReleaseMask
+        // | PointerMotionMask | ButtonPressMask | ButtonReleaseMask
+        | ExposureMask;
 
     attribs.colormap = X_cmap;
     attribs.border_pixel = 0;
+
+    X_width = SCREENWIDTH * multiply;
+    X_height = SCREENHEIGHT * multiply;
 
     // create the main window
     X_mainWindow = XCreateWindow(	X_display,
@@ -650,10 +649,12 @@ void I_InitGraphics(void)
 					&attribs );
 
     XDefineCursor(X_display, X_mainWindow,
-		  createnullcursor( X_display, X_mainWindow ) );
+                  createnullcursor( X_display, X_mainWindow ) );
 
     // create the GC
+    int			valuemask;
     valuemask = GCGraphicsExposures;
+    XGCValues		xgcvalues;
     xgcvalues.graphics_exposures = False;
     X_gc = XCreateGC(	X_display,
   			X_mainWindow,
@@ -664,23 +665,21 @@ void I_InitGraphics(void)
     XMapWindow(X_display, X_mainWindow);
 
     // wait until it is OK to draw
-    oktodraw = 0;
-    while (!oktodraw)
-    {
-	XNextEvent(X_display, &X_event);
-	if (X_event.type == Expose
-	    && !X_event.xexpose.count)
-	{
-	    oktodraw = 1;
-	}
+    int			oktodraw = 0;
+    while (!oktodraw) {
+        XNextEvent(X_display, &X_event);
+        if (X_event.type == Expose && !X_event.xexpose.count) {
+            oktodraw = 1;
+        }
     }
 
     // grabs the pointer so it is restricted to this window
-    if (grabMouse)
-	XGrabPointer(X_display, X_mainWindow, True,
-		     ButtonPressMask|ButtonReleaseMask|PointerMotionMask,
-		     GrabModeAsync, GrabModeAsync,
-		     X_mainWindow, None, CurrentTime);
+    if (grabMouse) {
+        XGrabPointer(X_display, X_mainWindow, True,
+                     ButtonPressMask|ButtonReleaseMask|PointerMotionMask,
+                     GrabModeAsync, GrabModeAsync,
+                     X_mainWindow, None, CurrentTime);
+    }
 
 	image = XCreateImage(	X_display,
     				X_visual,
@@ -693,11 +692,11 @@ void I_InitGraphics(void)
     				X_width );
 
 
-    if (multiply == 1)
-	screens[0] = (unsigned char *) (image->data);
-    else
-	screens[0] = (unsigned char *) malloc (SCREENWIDTH * SCREENHEIGHT);
-
+    if (multiply == 1) {
+        screens[0] = (unsigned char *) (image->data);
+    } else {
+        screens[0] = (unsigned char *) malloc (SCREENWIDTH * SCREENHEIGHT);
+    }
 }
 
 
