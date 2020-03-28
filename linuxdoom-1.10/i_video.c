@@ -570,45 +570,6 @@ void I_InitGraphics(void)
         }
     }
 
-    // use the default visual 
-    X_screen = DefaultScreen(X_display);
-    if (!XMatchVisualInfo(X_display, X_screen, 8, PseudoColor, &X_visualinfo)) {
-        I_Error("xdoom currently only supports 256-color PseudoColor screens");
-    }
-    X_visual = X_visualinfo.visual;
-
-    // create the colormap
-    X_cmap = XCreateColormap(X_display, RootWindow(X_display, X_screen),
-                             X_visual, AllocAll);
-
-    // setup attributes for main window
-    unsigned long	attribmask;
-    attribmask = CWEventMask | CWColormap | CWBorderPixel;
-
-    XSetWindowAttributes attribs;
-    attribs.event_mask =
-        KeyPressMask
-        | KeyReleaseMask
-        // | PointerMotionMask | ButtonPressMask | ButtonReleaseMask
-        | ExposureMask;
-
-    attribs.colormap = X_cmap;
-    attribs.border_pixel = 0;
-
-    // create the main window and set cursor
-    X_mainWindow = XCreateWindow(	X_display,
-					RootWindow(X_display, X_screen),
-					x, y,
-					X_width, X_height,
-					0, // borderwidth
-					8, // depth
-					InputOutput,
-					X_visual,
-					attribmask,
-					&attribs );
-    XDefineCursor(X_display, X_mainWindow,
-                  createnullcursor( X_display, X_mainWindow ) );
-
     // create the main window
     SDL_Window *window;
     int r_width = SCREENWIDTH * multiply;
