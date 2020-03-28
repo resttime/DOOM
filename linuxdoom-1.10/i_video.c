@@ -153,6 +153,7 @@ void I_ShutdownGraphics(void)
 {
   // Paranoia.
   image->data = NULL;
+  // TODO Probably should destroy the SDL2 window here!
 }
 
 
@@ -508,35 +509,6 @@ void I_SetPalette (byte* palette)
     UploadNewPalette(X_cmap, palette);
 }
 
-
-// SDL2
-void I_InitSdl(void)
-{
-    SDL_Init(SDL_INIT_VIDEO);
-
-    SDL_Window *window;
-    window = SDL_CreateWindow(
-        "An SDL2 window",                  // window title
-        SDL_WINDOWPOS_UNDEFINED,           // initial x position
-        SDL_WINDOWPOS_UNDEFINED,           // initial y position
-        640,                               // width, in pixels
-        480,                               // height, in pixels
-        SDL_WINDOW_OPENGL                  // flags - see below
-        );
-    if (window == NULL) {
-        I_Error("Could not create SDL2 window");
-    }
-    // The window is open: could enter program loop here (see SDL_PollEvent())
-
-    SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
-
-    // Close and destroy the window
-    SDL_DestroyWindow(window);
-
-    // Clean up
-    SDL_Quit();
-}
-
 void I_InitGraphics(void)
 {
     // Flag whether this function has been run already since we only
@@ -548,7 +520,7 @@ void I_InitGraphics(void)
     firsttime = false;
 
     // Intialize the SDL
-    I_InitSdl();
+    SDL_Init(SDL_INIT_VIDEO);
 
     // Set the interrupt signal to quit
     signal(SIGINT, (void (*)(int)) I_Quit);
@@ -623,10 +595,7 @@ void I_InitGraphics(void)
     attribs.colormap = X_cmap;
     attribs.border_pixel = 0;
 
-    X_width = SCREENWIDTH * multiply;
-    X_height = SCREENHEIGHT * multiply;
-
-    // create the main window
+    // create the main window and set cursor
     X_mainWindow = XCreateWindow(	X_display,
 					RootWindow(X_display, X_screen),
 					x, y,
@@ -637,9 +606,24 @@ void I_InitGraphics(void)
 					X_visual,
 					attribmask,
 					&attribs );
-
     XDefineCursor(X_display, X_mainWindow,
                   createnullcursor( X_display, X_mainWindow ) );
+
+    // create the main window
+    SDL_Window *window;
+    int r_width = SCREENWIDTH * multiply;
+    int r_height = SCREENHEIGHT * multiply;
+    window = SDL_CreateWindow(
+        "An SDL2 window",                  // window title
+        SDL_WINDOWPOS_UNDEFINED,           // initial x position
+        SDL_WINDOWPOS_UNDEFINED,           // initial y position
+        r_width,                           // width, in pixels
+        r_height,                          // height, in pixels
+        SDL_WINDOW_SHOWN                   // flags - see below
+        );
+    if (window == NULL) {
+        I_Error("Could not create SDL2 window");
+    }
 
     // create the GC
     int			valuemask;
