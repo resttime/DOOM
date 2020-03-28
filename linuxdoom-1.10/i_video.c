@@ -626,27 +626,6 @@ void I_InitGraphics(void)
     }
     SDL_ShowCursor(SDL_DISABLE);
 
-    // create the GC
-    int			valuemask;
-    valuemask = GCGraphicsExposures;
-    XGCValues		xgcvalues;
-    xgcvalues.graphics_exposures = False;
-    X_gc = XCreateGC(	X_display,
-  			X_mainWindow,
-  			valuemask,
-  			&xgcvalues );
-
-    // map the window
-    XMapWindow(X_display, X_mainWindow);
-
-    // wait until it is OK to draw
-    bool oktodraw = false;
-    while (!oktodraw) {
-        XNextEvent(X_display, &X_event);
-        if (X_event.type == Expose && !X_event.xexpose.count) {
-            oktodraw = true;
-        }
-    }
 
     // grabs the pointer so it is restricted to this window
     if (grabMouse) {
