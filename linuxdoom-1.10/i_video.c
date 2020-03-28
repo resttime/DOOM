@@ -51,8 +51,6 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include "SDL.h"
 
-#define POINTER_WARP_COUNTDOWN	1
-
 // Display*	X_display=0;
 // Window		X_mainWindow;
 // Colormap	X_cmap;
@@ -65,18 +63,11 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 // int		X_width;
 // int		X_height;
 
-// Fake mouse handling.
-// This cannot work properly w/o DGA.
-// Needs an invisible mouse cursor at least.
-boolean		grabMouse;
-int		doPointerWarp = POINTER_WARP_COUNTDOWN;
-
 // Blocky mode,
 // replace each 320x200 pixel with multiply*multiply pixels.
 // According to Dave Taylor, it still is a bonehead thing
 // to use ....
 static int	multiply=1;
-
 
 //
 //  Translates the key currently in X_event
@@ -266,24 +257,6 @@ void I_StartTic (void)
 
     while (XPending(X_display))
 	I_GetEvent();
-
-    // Warp the pointer back to the middle of the window
-    //  or it will wander off - that is, the game will
-    //  loose input focus within X11.
-    if (grabMouse)
-    {
-	if (!--doPointerWarp)
-	{
-	    XWarpPointer( X_display,
-			  None,
-			  X_mainWindow,
-			  0, 0,
-			  0, 0,
-			  X_width/2, X_height/2);
-
-	    doPointerWarp = POINTER_WARP_COUNTDOWN;
-	}
-    }
 
     mousemoved = false;
 
@@ -545,9 +518,6 @@ void I_InitGraphics(void)
         displayname = 0;
     }
 
-    // check if the user wants to grab the mouse (quite unnice)
-    grabMouse = !!M_CheckParm("-grabmouse");
-
     // check for command-line geometry
     int			x=0;
     int			y=0;
@@ -586,13 +556,9 @@ void I_InitGraphics(void)
         I_Error("Could not create SDL2 window");
     }
 
-    // hide the cursor
-    SDL_ShowCursor(SDL_DISABLE);
-
-    // grabs the pointer so it is restricted to this window
-    if (grabMouse) {
-        SDL_SetWindowGrab(window, SDL_TRUE);
-    }
+    // grab, hide, and lock pointer position for motion events
+    SDL_SetWindowGrab(window, SDL_TRUE);
+    SDL_SetRelativeMouseMode(SDL_TRUE);
 
     // create renderer to render context of the window
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
