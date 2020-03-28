@@ -624,6 +624,7 @@ void I_InitGraphics(void)
     if (window == NULL) {
         I_Error("Could not create SDL2 window");
     }
+    SDL_ShowCursor(SDL_DISABLE);
 
     // create the GC
     int			valuemask;
