@@ -640,11 +640,11 @@ void I_InitGraphics(void)
     XMapWindow(X_display, X_mainWindow);
 
     // wait until it is OK to draw
-    int			oktodraw = 0;
+    bool oktodraw = false;
     while (!oktodraw) {
         XNextEvent(X_display, &X_event);
         if (X_event.type == Expose && !X_event.xexpose.count) {
-            oktodraw = 1;
+            oktodraw = true;
         }
     }
 
