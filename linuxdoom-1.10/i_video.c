@@ -650,10 +650,7 @@ void I_InitGraphics(void)
 
     // grabs the pointer so it is restricted to this window
     if (grabMouse) {
-        XGrabPointer(X_display, X_mainWindow, True,
-                     ButtonPressMask|ButtonReleaseMask|PointerMotionMask,
-                     GrabModeAsync, GrabModeAsync,
-                     X_mainWindow, None, CurrentTime);
+        SDL_SetWindowGrab(window, SDL_TRUE)
     }
 
 	image = XCreateImage(	X_display,
