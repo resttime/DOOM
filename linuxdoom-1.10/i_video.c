@@ -598,16 +598,6 @@ void I_InitGraphics(void)
         }
     }
 
-    // open the display
-    X_display = XOpenDisplay(displayname);
-    if (!X_display) {
-        if (displayname) {
-            I_Error("Could not open display [%s]", displayname);
-        } else {
-            I_Error("Could not open display (DISPLAY=[%s])", getenv("DISPLAY"));
-        }
-    }
-
     // use the default visual 
     X_screen = DefaultScreen(X_display);
     if (!XMatchVisualInfo(X_display, X_screen, 8, PseudoColor, &X_visualinfo)) {
