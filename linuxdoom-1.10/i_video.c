@@ -70,6 +70,8 @@ SDL_Texture *texture;
 int r_width;
 int r_height;
 
+boolean grabMouse;
+
 // Blocky mode,
 // replace each 320x200 pixel with multiply*multiply pixels.
 // According to Dave Taylor, it still is a bonehead thing
@@ -487,6 +489,9 @@ void I_InitGraphics(void)
         multiply = 4;
     }
 
+    // check if the user wanted to grab the mouse (quite unnice)
+    grabMouse = !!M_CheckParm("-grabmouse");
+
     // check for command-line display name
     int			pnum;
     char*		displayname;
@@ -534,8 +539,10 @@ void I_InitGraphics(void)
     }
 
     // grab, hide, and lock pointer position for motion events
-    SDL_SetWindowGrab(window, SDL_TRUE);
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+    if (grabMouse) {
+        SDL_SetWindowGrab(window, SDL_TRUE);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
+    };
 
     // create renderer to render context of the window
     renderer = SDL_CreateRenderer(window, -1, 0);
