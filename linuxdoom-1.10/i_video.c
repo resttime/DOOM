@@ -551,7 +551,7 @@ void I_InitGraphics(void)
     r_width = SCREENWIDTH * multiply;
     r_height = SCREENHEIGHT * multiply;
     window = SDL_CreateWindow(
-        "An SDL2 window",                  // window title
+        displayname,                       // window title
         SDL_WINDOWPOS_UNDEFINED,           // initial x position
         SDL_WINDOWPOS_UNDEFINED,           // initial y position
         r_width,                           // width, in pixels
