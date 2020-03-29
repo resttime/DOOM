@@ -62,6 +62,13 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 // XImage*		image;
 // int		X_width;
 // int		X_height;
+SDL_Window *window;
+SDL_Renderer *renderer;
+SDL_Surface *surface;
+SDL_Texture *texture;
+
+int r_width;
+int r_height;
 
 // Blocky mode,
 // replace each 320x200 pixel with multiply*multiply pixels.
@@ -140,11 +147,11 @@ int xlatekey(void)
 
 }
 
-void I_ShutdownGraphics(void)
-{
-  // Paranoia.
-  image->data = NULL;
-  // TODO Probably should destroy the SDL2 window here!
+void I_ShutdownGraphics(void) {
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
 }
 
 
@@ -541,9 +548,8 @@ void I_InitGraphics(void)
     }
 
     // create the main window
-    SDL_Window *window;
-    int r_width = SCREENWIDTH * multiply;
-    int r_height = SCREENHEIGHT * multiply;
+    r_width = SCREENWIDTH * multiply;
+    r_height = SCREENHEIGHT * multiply;
     window = SDL_CreateWindow(
         "An SDL2 window",                  // window title
         SDL_WINDOWPOS_UNDEFINED,           // initial x position
@@ -561,10 +567,10 @@ void I_InitGraphics(void)
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
     // create renderer to render context of the window
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+    renderer = SDL_CreateRenderer(window, -1, 0);
 
     // create surface for image data
-    SDL_Surface* surface = SDL_CreateRGBSurface(0, r_width, r_height, 8, 0, 0, 0, 0);
+    surface = SDL_CreateRGBSurface(0, r_width, r_height, 8, 0, 0, 0, 0);
 
     if (multiply == 1) {
         screens[0] = (unsigned char *) (image->data);
