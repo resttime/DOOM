@@ -66,6 +66,7 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Surface *surface;
 SDL_Texture *texture;
+SDL_Event sdl_event;
 
 int r_width;
 int r_height;
@@ -79,7 +80,7 @@ boolean grabMouse;
 static int	multiply=1;
 
 //
-//  Translates the key currently in X_event
+//  Translates the SDL_Keycode to doom keycode
 //
 
 int xlatekey(void)
@@ -87,59 +88,58 @@ int xlatekey(void)
 
     int rc;
 
-    switch(rc = XKeycodeToKeysym(X_display, X_event.xkey.keycode, 0))
-    {
-      case XK_Left:	rc = KEY_LEFTARROW;	break;
-      case XK_Right:	rc = KEY_RIGHTARROW;	break;
-      case XK_Down:	rc = KEY_DOWNARROW;	break;
-      case XK_Up:	rc = KEY_UPARROW;	break;
-      case XK_Escape:	rc = KEY_ESCAPE;	break;
-      case XK_Return:	rc = KEY_ENTER;		break;
-      case XK_Tab:	rc = KEY_TAB;		break;
-      case XK_F1:	rc = KEY_F1;		break;
-      case XK_F2:	rc = KEY_F2;		break;
-      case XK_F3:	rc = KEY_F3;		break;
-      case XK_F4:	rc = KEY_F4;		break;
-      case XK_F5:	rc = KEY_F5;		break;
-      case XK_F6:	rc = KEY_F6;		break;
-      case XK_F7:	rc = KEY_F7;		break;
-      case XK_F8:	rc = KEY_F8;		break;
-      case XK_F9:	rc = KEY_F9;		break;
-      case XK_F10:	rc = KEY_F10;		break;
-      case XK_F11:	rc = KEY_F11;		break;
-      case XK_F12:	rc = KEY_F12;		break;
+    switch(rc = sdl_event.key.keysym.sym) {
+      case SDLK_LEFT:	rc = KEY_LEFTARROW;	break;
+      case SDLK_RIGHT:	rc = KEY_RIGHTARROW;	break;
+      case SDLK_DOWN:	rc = KEY_DOWNARROW;	break;
+      case SDLK_UP:	rc = KEY_UPARROW;	break;
+      case SDLK_ESCAPE:	rc = KEY_ESCAPE;	break;
+      case SDLK_RETURN:	rc = KEY_ENTER;		break;
+      case SDLK_TAB:	rc = KEY_TAB;		break;
+      case SDLK_F1:	rc = KEY_F1;		break;
+      case SDLK_F2:	rc = KEY_F2;		break;
+      case SDLK_F3:	rc = KEY_F3;		break;
+      case SDLK_F4:	rc = KEY_F4;		break;
+      case SDLK_F5:	rc = KEY_F5;		break;
+      case SDLK_F6:	rc = KEY_F6;		break;
+      case SDLK_F7:	rc = KEY_F7;		break;
+      case SDLK_F8:	rc = KEY_F8;		break;
+      case SDLK_F9:	rc = KEY_F9;		break;
+      case SDLK_F10:	rc = KEY_F10;		break;
+      case SDLK_F11:	rc = KEY_F11;		break;
+      case SDLK_F12:	rc = KEY_F12;		break;
 	
-      case XK_BackSpace:
-      case XK_Delete:	rc = KEY_BACKSPACE;	break;
+      case SDLK_BACKSPACE:
+      case SDLK_DELETE:	rc = KEY_BACKSPACE;	break;
 
-      case XK_Pause:	rc = KEY_PAUSE;		break;
+      case SDLK_PAUSE:	rc = KEY_PAUSE;		break;
 
-      case XK_KP_Equal:
-      case XK_equal:	rc = KEY_EQUALS;	break;
+      case SDLK_KP_EQUALS:
+      case SDLK_EQUALS:	rc = KEY_EQUALS;	break;
 
-      case XK_KP_Subtract:
-      case XK_minus:	rc = KEY_MINUS;		break;
+      case SDLK_KP_MINUS:
+      case SDLK_MINUS:	rc = KEY_MINUS;		break;
 
-      case XK_Shift_L:
-      case XK_Shift_R:
+      case SDLK_LSHIFT:
+      case SDLK_RSHIFT:
 	rc = KEY_RSHIFT;
 	break;
 	
-      case XK_Control_L:
-      case XK_Control_R:
+      case SDLK_LCTRL:
+      case SDLK_RCTRL:
 	rc = KEY_RCTRL;
 	break;
 	
-      case XK_Alt_L:
-      case XK_Meta_L:
-      case XK_Alt_R:
-      case XK_Meta_R:
+      case SDLK_LALT:
+      case SDLK_LGUI:
+      case SDLK_RALT:
+      case SDLK_RGUI:
 	rc = KEY_RALT;
 	break;
 	
       default:
-	if (rc >= XK_space && rc <= XK_asciitilde)
-	    rc = rc - XK_space + ' ';
+	if (rc >= SDLK_SPACE && rc <= SDLK_BACKQUOTE)
+	    rc = rc - SDLK_SPACE + ' ';
 	if (rc >= 'A' && rc <= 'Z')
 	    rc = rc - 'A' + 'a';
 	break;
@@ -167,92 +167,66 @@ void I_StartFrame (void)
 
 }
 
-static int	lastmousex = 0;
-static int	lastmousey = 0;
-boolean		mousemoved = false;
-
 void I_GetEvent(void)
 {
 
     event_t event;
 
     // put event-grabbing stuff in here
-    XNextEvent(X_display, &X_event);
-    switch (X_event.type)
-    {
-      case KeyPress:
-	event.type = ev_keydown;
-	event.data1 = xlatekey();
-	D_PostEvent(&event);
-	// fprintf(stderr, "k");
-	break;
-      case KeyRelease:
-	event.type = ev_keyup;
-	event.data1 = xlatekey();
-	D_PostEvent(&event);
-	// fprintf(stderr, "ku");
-	break;
-      case ButtonPress:
-	event.type = ev_mouse;
-	event.data1 =
-	    (X_event.xbutton.state & Button1Mask)
-	    | (X_event.xbutton.state & Button2Mask ? 2 : 0)
-	    | (X_event.xbutton.state & Button3Mask ? 4 : 0)
-	    | (X_event.xbutton.button == Button1)
-	    | (X_event.xbutton.button == Button2 ? 2 : 0)
-	    | (X_event.xbutton.button == Button3 ? 4 : 0);
-	event.data2 = event.data3 = 0;
-	D_PostEvent(&event);
-	// fprintf(stderr, "b");
-	break;
-      case ButtonRelease:
-	event.type = ev_mouse;
-	event.data1 =
-	    (X_event.xbutton.state & Button1Mask)
-	    | (X_event.xbutton.state & Button2Mask ? 2 : 0)
-	    | (X_event.xbutton.state & Button3Mask ? 4 : 0);
-	// suggest parentheses around arithmetic in operand of |
-	event.data1 =
-	    event.data1
-	    ^ (X_event.xbutton.button == Button1 ? 1 : 0)
-	    ^ (X_event.xbutton.button == Button2 ? 2 : 0)
-	    ^ (X_event.xbutton.button == Button3 ? 4 : 0);
-	event.data2 = event.data3 = 0;
-	D_PostEvent(&event);
-	// fprintf(stderr, "bu");
-	break;
-      case MotionNotify:
-	event.type = ev_mouse;
-	event.data1 =
-	    (X_event.xmotion.state & Button1Mask)
-	    | (X_event.xmotion.state & Button2Mask ? 2 : 0)
-	    | (X_event.xmotion.state & Button3Mask ? 4 : 0);
-	event.data2 = (X_event.xmotion.x - lastmousex) << 2;
-	event.data3 = (lastmousey - X_event.xmotion.y) << 2;
-
-	if (event.data2 || event.data3)
-	{
-	    lastmousex = X_event.xmotion.x;
-	    lastmousey = X_event.xmotion.y;
-	    if (X_event.xmotion.x != X_width/2 &&
-		X_event.xmotion.y != X_height/2)
-	    {
-		D_PostEvent(&event);
-		// fprintf(stderr, "m");
-		mousemoved = false;
-	    } else
-	    {
-		mousemoved = true;
-	    }
-	}
-	break;
-	
-      case Expose:
-      case ConfigureNotify:
-	break;
-	
+    while (SDL_PollEvent(&sdl_event)) {
+        switch (sdl_event.type) {
+            case SDL_KEYDOWN:
+                event.type = ev_keydown;
+                event.data1 = xlatekey();
+                D_PostEvent(&event);
+                // fprintf(stderr, "k");
+                break;
+            case SDL_KEYUP:
+                event.type = ev_keyup;
+                event.data1 = xlatekey();
+                D_PostEvent(&event);
+                // fprintf(stderr, "ku");
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                event.type = ev_mouse;
+                event.data1 =
+                    SDL_GetMouseState(NULL, NULL)
+                    | (sdl_event.button.button == SDL_BUTTON_LEFT)
+                    | (sdl_event.button.button == SDL_BUTTON_MIDDLE ? 2 : 0)
+                    | (sdl_event.button.button == SDL_BUTTON_RIGHT ? 4 : 0);
+                event.data2 = event.data3 = 0;
+                D_PostEvent(&event);
+                // fprintf(stderr, "b");
+                break;
+            case SDL_MOUSEBUTTONUP:
+                event.type = ev_mouse;
+                event.data1 =
+                    SDL_GetMouseState(NULL, NULL);
+                // suggest parentheses around arithmetic in operand of |
+                event.data1 =
+                    event.data1
+                    ^ (sdl_event.button.button == SDL_BUTTON_LEFT ? 1 : 0)
+                    ^ (sdl_event.button.button == SDL_BUTTON_MIDDLE ? 2 : 0)
+                    ^ (sdl_event.button.button == SDL_BUTTON_RIGHT ? 4 : 0);
+                event.data2 = event.data3 = 0;
+                D_PostEvent(&event);
+                // fprintf(stderr, "bu");
+                break;
+            case SDL_MOUSEMOTION:
+                event.type = ev_mouse;
+                event.data1 = SDL_GetMouseState(NULL, NULL);
+                event.data2 = sdl_event.motion.xrel << 2;
+                event.data3 = -sdl_event.motion.yrel << 2;
+                if (event.data2 || event.data3) {
+                    D_PostEvent(&event);
+                    // fprintf(stderr, "m");
+                }
+                break;
+            default:
+                // fprintf(stderr, "?");
+                break;
+        }
     }
-
 }
 
 //
@@ -260,14 +234,9 @@ void I_GetEvent(void)
 //
 void I_StartTic (void)
 {
-
     if (!window) return;
 
-    SDL_WaitEvent(NULL);
 	I_GetEvent();
-
-    mousemoved = false;
-
 }
 
 
