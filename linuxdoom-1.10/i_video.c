@@ -316,7 +316,7 @@ void I_FinishUpdate (void)
 
 	ilineptr = (unsigned int *) (screens[0]);
 	for (i=0 ; i<2 ; i++)
-	    olineptrs[i] = (unsigned int *) &image->data[i*X_width];
+	    olineptrs[i] = (unsigned int *) &surface->pixels[i*r_width];
 
 	y = SCREENHEIGHT;
 	while (y--)
@@ -343,8 +343,8 @@ void I_FinishUpdate (void)
 		*olineptrs[1]++ = twoopixels;
 #endif
 	    } while (x-=4);
-	    olineptrs[0] += X_width/4;
-	    olineptrs[1] += X_width/4;
+	    olineptrs[0] += r_width/4;
+	    olineptrs[1] += r_width/4;
 	}
 
     }
@@ -358,7 +358,7 @@ void I_FinishUpdate (void)
 
 	ilineptr = (unsigned int *) (screens[0]);
 	for (i=0 ; i<3 ; i++)
-	    olineptrs[i] = (unsigned int *) &image->data[i*X_width];
+	    olineptrs[i] = (unsigned int *) &surface->pixels[i*r_width];
 
 	y = SCREENHEIGHT;
 	while (y--)
@@ -398,9 +398,9 @@ void I_FinishUpdate (void)
 		*olineptrs[2]++ = fouropixels[0];
 #endif
 	    } while (x-=4);
-	    olineptrs[0] += 2*X_width/4;
-	    olineptrs[1] += 2*X_width/4;
-	    olineptrs[2] += 2*X_width/4;
+	    olineptrs[0] += 2*r_width/4;
+	    olineptrs[1] += 2*r_width/4;
+	    olineptrs[2] += 2*r_width/4;
 	}
 
     }
@@ -408,20 +408,16 @@ void I_FinishUpdate (void)
     {
 	// Broken. Gotta fix this some day.
 	void Expand4(unsigned *, double *);
-  	Expand4 ((unsigned *)(screens[0]), (double *) (image->data));
+  	Expand4 ((unsigned *)(screens[0]), (double *) (surface->pixels));
     }
 
-	// draw the image
-	XPutImage(	X_display,
-			X_mainWindow,
-			X_gc,
-			image,
-			0, 0,
-			0, 0,
-			X_width, X_height );
+    // create texture and load into renderer
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
 
-	// sync up with server
-	XSync(X_display, False);
+    // display renderer and destroy texture
+    SDL_RenderPresent(renderer);
+    SDL_DestroyTexture(texture);
 }
 
 
@@ -437,47 +433,23 @@ void I_ReadScreen (byte* scr)
 //
 // Palette stuff.
 //
-static XColor	colors[256];
+static SDL_Color colors[256];
 
-void UploadNewPalette(Colormap cmap, byte *palette)
+void UploadNewPalette(byte *palette)
 {
+    // set the colormap entries
+    for (register int i=0 ; i<256 ; i++) {
+        register int c;
+        c = gammatable[usegamma][*palette++];
+        colors[i].r = (c<<8) + c;
+        c = gammatable[usegamma][*palette++];
+        colors[i].g = (c<<8) + c;
+        c = gammatable[usegamma][*palette++];
+        colors[i].b = (c<<8) + c;
+    }
 
-    register int	i;
-    register int	c;
-    static boolean	firstcall = true;
-
-#ifdef __cplusplus
-    if (X_visualinfo.c_class == PseudoColor && X_visualinfo.depth == 8)
-#else
-    if (X_visualinfo.class == PseudoColor && X_visualinfo.depth == 8)
-#endif
-	{
-	    // initialize the colormap
-	    if (firstcall)
-	    {
-		firstcall = false;
-		for (i=0 ; i<256 ; i++)
-		{
-		    colors[i].pixel = i;
-		    colors[i].flags = DoRed|DoGreen|DoBlue;
-		}
-	    }
-
-	    // set the X colormap entries
-	    for (i=0 ; i<256 ; i++)
-	    {
-		c = gammatable[usegamma][*palette++];
-		colors[i].red = (c<<8) + c;
-		c = gammatable[usegamma][*palette++];
-		colors[i].green = (c<<8) + c;
-		c = gammatable[usegamma][*palette++];
-		colors[i].blue = (c<<8) + c;
-	    }
-
-	    // store the colors to the current colormap
-	    XStoreColors(X_display, cmap, colors, 256);
-
-	}
+    //  store the colors to the current colormap
+    SDL_SetPaletteColors(surface->format->palette, colors, 0, 256);
 }
 
 //
@@ -485,7 +457,7 @@ void UploadNewPalette(Colormap cmap, byte *palette)
 //
 void I_SetPalette (byte* palette)
 {
-    UploadNewPalette(X_cmap, palette);
+    UploadNewPalette(palette);
 }
 
 void I_InitGraphics(void)
@@ -572,7 +544,7 @@ void I_InitGraphics(void)
     surface = SDL_CreateRGBSurface(0, r_width, r_height, 8, 0, 0, 0, 0);
 
     if (multiply == 1) {
-        screens[0] = (unsigned char *) (image->data);
+        screens[0] = (unsigned char *) (surface->pixels);
     } else {
         screens[0] = (unsigned char *) malloc (SCREENWIDTH * SCREENHEIGHT);
     }
