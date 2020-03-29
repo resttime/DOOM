@@ -259,10 +259,9 @@ void I_GetEvent(void)
 void I_StartTic (void)
 {
 
-    if (!X_display)
-	return;
+    if (!window) return;
 
-    while (XPending(X_display))
+    SDL_WaitEvent(NULL);
 	I_GetEvent();
 
     mousemoved = false;
