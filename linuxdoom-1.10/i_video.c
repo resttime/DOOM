@@ -17,7 +17,7 @@
 // $Log:$
 //
 // DESCRIPTION:
-//	DOOM graphics stuff for X11, UNIX.
+//	DOOM graphics stuff for SDL2, UNIX.
 //
 //-----------------------------------------------------------------------------
 
@@ -27,10 +27,6 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ipc.h>
-
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
 
 #include <stdarg.h>
 #include <sys/time.h>
@@ -51,17 +47,6 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include "SDL.h"
 
-// Display*	X_display=0;
-// Window		X_mainWindow;
-// Colormap	X_cmap;
-// Visual*		X_visual;
-// GC		X_gc;
-// XEvent		X_event;
-// int		X_screen;
-// XVisualInfo	X_visualinfo;
-// XImage*		image;
-// int		X_width;
-// int		X_height;
 SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Surface *surface;
