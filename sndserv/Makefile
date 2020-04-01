@@ -9,7 +9,7 @@
 CC=gcc
 CFLAGS=-O -DNORMALUNIX -DLINUX
 LDFLAGS=
-LIBS=-lm
+LIBS=-lm -lSDL2 -lSDL2_mixer
 
 O=linux
 
