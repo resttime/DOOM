@@ -57,7 +57,7 @@ rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 #ifdef SNDSERV
 // Separate sound server process.
 FILE*	sndserver=0;
-char*	sndserver_filename = "./sndserver ";
+char*	sndserver_filename = "./sndserver";
 #elif SNDINTR
 
 // Update all 30 millisecs, approx. 30fps synchronized.
