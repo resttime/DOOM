@@ -55,6 +55,8 @@ static const char rcsid[] = "$Id: soundsrv.c,v 1.3 1997/01/29 22:40:44 b1 Exp $"
 #include "soundsrv.h"
 #include "wadread.h"
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 
 //
@@ -687,6 +689,11 @@ main
 			    sep = (commandbuf[6]<<4) + commandbuf[7];
 
 			    handle = addsfx(sndnum, vol, step, sep);
+
+                Mix_Chunk *chunk = Mix_QuickLoad_RAW(S_sfx[sndnum].data, lengths[sndnum]);
+                chunk->volume = 64;
+                Mix_PlayChannel(-1, chunk, 0);
+                free(chunk);
 			    // returns the handle
 			    //	outputushort(handle);
 			    break;
