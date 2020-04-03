@@ -6,8 +6,8 @@
 #
 CC=  gcc  # gcc or g++
 
-CFLAGS=-g -Wall -DNORMALUNIX -DLINUX # -DUSEASM 
-INC=-I/usr/include/SDL2
+CFLAGS=-g -Wall -DNORMALUNIX # -DUSEASM
+INC=
 LDFLAGS=
 LIBS=-lnsl -lm -lSDL2
 

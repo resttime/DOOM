@@ -60,7 +60,7 @@ FixedDiv
   fixed_t	b )
 {
     if ( (abs(a)>>14) >= abs(b))
-	return (a^b)<0 ? MININT : MAXINT;
+	return (a^b)<0 ? INT_MIN : INT_MAX;
     return FixedDiv2 (a,b);
 }
 

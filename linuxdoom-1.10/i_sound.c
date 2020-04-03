@@ -35,16 +35,9 @@ rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 
 #include <errno.h>
 
-#ifndef LINUX
-#include <sys/filio.h>
-#endif
-
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-
-// Linux voxware output.
-#include <linux/soundcard.h>
 
 // Timer stuff. Experimental.
 #include <time.h>

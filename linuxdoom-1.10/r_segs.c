@@ -162,7 +162,7 @@ R_RenderMaskedSegRange
     for (dc_x = x1 ; dc_x <= x2 ; dc_x++)
     {
 	// calculate lighting
-	if (maskedtexturecol[dc_x] != MAXSHORT)
+	if (maskedtexturecol[dc_x] != SHRT_MAX)
 	{
 	    if (!fixedcolormap)
 	    {
@@ -182,7 +182,7 @@ R_RenderMaskedSegRange
 		(byte *)R_GetColumn(texnum,maskedtexturecol[dc_x]) -3);
 			
 	    R_DrawMaskedColumn (col);
-	    maskedtexturecol[dc_x] = MAXSHORT;
+	    maskedtexturecol[dc_x] = SHRT_MAX;
 	}
 	spryscale += rw_scalestep;
     }
@@ -476,8 +476,8 @@ R_StoreWallRange
 	ds_p->silhouette = SIL_BOTH;
 	ds_p->sprtopclip = screenheightarray;
 	ds_p->sprbottomclip = negonearray;
-	ds_p->bsilheight = MAXINT;
-	ds_p->tsilheight = MININT;
+	ds_p->bsilheight = INT_MAX;
+	ds_p->tsilheight = INT_MIN;
     }
     else
     {
@@ -493,7 +493,7 @@ R_StoreWallRange
 	else if (backsector->floorheight > viewz)
 	{
 	    ds_p->silhouette = SIL_BOTTOM;
-	    ds_p->bsilheight = MAXINT;
+	    ds_p->bsilheight = INT_MAX;
 	    // ds_p->sprbottomclip = negonearray;
 	}
 	
@@ -505,21 +505,21 @@ R_StoreWallRange
 	else if (backsector->ceilingheight < viewz)
 	{
 	    ds_p->silhouette |= SIL_TOP;
-	    ds_p->tsilheight = MININT;
+	    ds_p->tsilheight = INT_MIN;
 	    // ds_p->sprtopclip = screenheightarray;
 	}
 		
 	if (backsector->ceilingheight <= frontsector->floorheight)
 	{
 	    ds_p->sprbottomclip = negonearray;
-	    ds_p->bsilheight = MAXINT;
+	    ds_p->bsilheight = INT_MAX;
 	    ds_p->silhouette |= SIL_BOTTOM;
 	}
 	
 	if (backsector->floorheight >= frontsector->ceilingheight)
 	{
 	    ds_p->sprtopclip = screenheightarray;
-	    ds_p->tsilheight = MININT;
+	    ds_p->tsilheight = INT_MIN;
 	    ds_p->silhouette |= SIL_TOP;
 	}
 	
@@ -734,12 +734,12 @@ R_StoreWallRange
     if (maskedtexture && !(ds_p->silhouette&SIL_TOP))
     {
 	ds_p->silhouette |= SIL_TOP;
-	ds_p->tsilheight = MININT;
+	ds_p->tsilheight = INT_MIN;
     }
     if (maskedtexture && !(ds_p->silhouette&SIL_BOTTOM))
     {
 	ds_p->silhouette |= SIL_BOTTOM;
-	ds_p->bsilheight = MAXINT;
+	ds_p->bsilheight = INT_MAX;
     }
     ds_p++;
 }

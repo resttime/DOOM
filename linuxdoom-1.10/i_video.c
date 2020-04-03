@@ -45,7 +45,7 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include "doomdef.h"
 
-#include "SDL.h"
+#include <SDL2/SDL.h>
 
 SDL_Window *window;
 SDL_Renderer *renderer;
