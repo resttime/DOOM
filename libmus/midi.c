@@ -1,28 +1,46 @@
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
-typedef struct {
-    char id[4];
-    uint32_t chunklen;
-    uint16_t format;
-    uint16_t ntracks;
-    uint16_t tickdiv;
-} midiheader_t;
+// MIDI is big-endian!
 
-typedef struct {
-} trackchunk_t;
+typedef struct midi_t {
+    // Header
+    uint8_t header_id[4]; // MThd
+    uint32_t chunklen; // Length of header, 6 for MUS
+    uint16_t format; // 0 for MUS
+    uint16_t ntracks; // 1 for MUS
+    uint16_t tickdiv; // 70 for MUS
 
-typedef struct {
-} deltatime_t;
+    // Track
+    uint8_t track_id[4]; // MTrk
+    uint32_t track_len; // Size of track data (Located at 18 for, MUS)
+    void *data; // The data
 
-typedef struct {
-} event_t;
+    // User defined
+    FILE *fp;
+    uint32_t offset; // Where start of data is, 22 for MUS
+    uint32_t pos;
+} midi_t;
 
-void create_header(uint16_t chunklen) {
-    midiheader_t *header;
-    strncpy(header->id, "MThd", 4);
-    header->chunklen = chunklen;
-    header->format = 0;
-    header->ntracks = 1;
-    header->tickdiv = 70;
+midi_t create_midi(const char* file) {
+    midi_t midi;
+
+    // Header
+    memcpy(&midi.header_id, "MThd", 4);
+    midi.chunklen = 6;
+    midi.format = 0;
+    midi.ntracks = 1;
+    midi.tickdiv = 70;
+
+    // Track
+    memcpy(&midi.track_id, "MTrk", 4);
+
+    midi.offset = 22; // Where the data starts
+    midi.pos = 0;
+
+    // Read MUS info
+    midi.fp = fopen(file, "w+");
+
+    return midi;
 }
