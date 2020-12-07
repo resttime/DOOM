@@ -65,8 +65,8 @@ midi_t *midi_create(const char* file) {
 
 void midi_free(midi_t *midi) {
     if (midi != NULL) {
-        if (midi->data) free(midi->data);
-        if (midi->fp) fclose(midi->fp);
+        if (midi->data != NULL) free(midi->data);
+        if (midi->fp != NULL) fclose(midi->fp);
         free(midi);
     }
 }
