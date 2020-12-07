@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct mus_t {
+typedef struct __attribute__((__packed__)) mus_t {
     uint8_t signature[4];
     uint16_t size;
     uint16_t offset; // Where the data starts

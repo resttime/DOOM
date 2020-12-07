@@ -3,7 +3,7 @@
 
 // MIDI is big-endian!
 
-typedef struct midi_t {
+typedef struct __attribute__((__packed__)) midi_t {
     // Header
     uint8_t header_id[4]; // MThd
     uint32_t chunklen; // Length of header, 6 for MUS
