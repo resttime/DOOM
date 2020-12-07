@@ -6,7 +6,7 @@
 typedef struct mus_t {
     uint8_t signature[4];
     uint16_t size;
-    uint16_t offset;
+    uint16_t offset; // Where the data starts
     uint16_t primary_channels;
     uint16_t secondary_channels;
     uint16_t num_instruments;
@@ -15,7 +15,7 @@ typedef struct mus_t {
     void *data;
 
     // User Defined
-    uint16_t pos;
+    uint16_t pos; // Position with respect to the offset
 } mus_t;
 
 
