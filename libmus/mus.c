@@ -23,8 +23,6 @@ mus_t *mus_load(const char* file) {
         return NULL;
     }
 
-    printf("Size of data is: %d\n", mus->size);
-
     // Allocate memory for all data
     mus->instruments = malloc(sizeof(uint16_t)*mus->num_instruments);
     mus->data = malloc(mus->size);
