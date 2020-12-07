@@ -17,14 +17,12 @@ typedef struct __attribute__((__packed__)) midi_t {
     void *data; // The data
 
     // User defined
-    FILE *fp; // NULL if we're loading from a file
     uint32_t offset; // Where start of data is, 22 for MUS
     uint32_t pos; // Position with respect to the offset
 } midi_t;
 
-midi_t *midi_create(const char *file);
+midi_t *midi_create();
 midi_t *midi_load(const char *file);
 void midi_free(midi_t *midi);
 void midi_write(midi_t* midi, const char *file);
-void write_track_len(midi_t* midi, uint16_t len);
 #endif
