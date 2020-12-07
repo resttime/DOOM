@@ -17,7 +17,7 @@ typedef struct midi_t {
     void *data; // The data
 
     // User defined
-    FILE *fp;
+    FILE *fp; // NULL if we're loading from a file
     uint32_t offset; // Where start of data is, 22 for MUS
     uint32_t pos; // Position with respect to the offset
 } midi_t;
