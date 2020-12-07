@@ -5,22 +5,28 @@
 #include "mus.h"
 
 mus_t *mus_load(const char* file) {
-    // Allocate struct
-    mus_t *mus = malloc(sizeof(mus_t));
-
-    // Read MUS info
+    // Open file
     FILE *fp = fopen(file, "r");
     if (fp == NULL) {
         fprintf(stderr, "Could not open file: %s\n", file);
         return NULL;
     }
+
+    // Allocate struct
+    mus_t *mus = malloc(sizeof(mus_t));
+    if (mus == NULL) {
+        fprintf(stderr, "Could not allocate mus\n");
+        return NULL;
+    }
+
+    // Read MUS info
     if (fread(mus, 4*sizeof(uint8_t) + 6*sizeof(uint16_t), 1, fp) != 1) {
         fprintf(stderr, "Could not read MUS header\n");
-        return NULL;
+        goto error;
     }
     if (strncmp(mus->signature, "MUS", 3) != 0 || mus->signature[3] != 0x1a) {
         fprintf(stderr, "Not a valid MUS file!\n");
-        return NULL;
+        goto error;
     }
 
     // Allocate memory for all data
@@ -56,6 +62,7 @@ mus_t *mus_load(const char* file) {
 
 error:
     mus_free(mus);
+    fclose(fp);
     return NULL;
 }
 
