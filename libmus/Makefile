@@ -15,5 +15,5 @@ clean:
 mus2midi: $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o mus2midi
 
-%.o: %.c
+%.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@
