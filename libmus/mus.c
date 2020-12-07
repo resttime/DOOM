@@ -16,7 +16,7 @@ mus_t *mus_load(const char* file) {
     mus_t *mus = malloc(sizeof(mus_t));
     if (mus == NULL) {
         fprintf(stderr, "Could not allocate mus\n");
-        return NULL;
+        goto error;
     }
 
     // Read MUS info
