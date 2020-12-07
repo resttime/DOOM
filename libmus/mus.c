@@ -61,11 +61,10 @@ error:
 
 void mus_free(mus_t *mus) {
     if (mus != NULL) {
-        free(mus->instruments);
-        free(mus->data);
+        if (mus->instruments != NULL) free(mus->instruments);
+        if (mus->data != NULL) free(mus->data);
+        free(mus);
     }
-    free(mus);
-    mus = NULL;
 };
 
 uint8_t mus_getc(mus_t *mus) {
@@ -119,6 +118,7 @@ event_t read_event(mus_t *mus) {
         case UNUSED:
             break;
     }
+
     return ev;
 }
 
