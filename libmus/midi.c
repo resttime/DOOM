@@ -125,3 +125,27 @@ void midi_write(midi_t *midi, const char *file) {
     }
     fclose(fp);
 }
+
+void midi_data_putc(midi_t *midi, uint8_t c) {
+    if (ntohl(midi->track_len)+1 >= 100*1024) {
+        fprintf(stderr, "Exceeded maximum size of the midi data buffer\n");
+        return;
+    }
+    ((uint8_t *)midi->data)[midi->pos++] = c;
+    midi->track_len = htonl(ntohl(midi->track_len)+1);
+
+}
+
+void midi_data_putdelay(midi_t *midi, uint16_t delay) {
+    uint32_t stack = 0;
+    stack += delay & 0x7F;
+    while (delay >>= 7) {
+        stack <<= 8;
+        stack += (delay & 0x7F) | 0x80;
+    }
+
+    while (1) {
+        midi_data_putc(midi, stack & 0xFF);
+        if (stack & 0x80) stack >>= 8; else break;
+    }
+}

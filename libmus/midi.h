@@ -25,4 +25,6 @@ midi_t *midi_create();
 midi_t *midi_load(const char *file);
 void midi_free(midi_t *midi);
 void midi_write(midi_t* midi, const char *file);
+void midi_data_putc(midi_t *midi, uint8_t c);
+void midi_data_putdelay(midi_t *midi, uint16_t delay);
 #endif
