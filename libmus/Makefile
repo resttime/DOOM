@@ -1,19 +1,18 @@
 CC=gcc
 CFLAGS=-g
 
-OBJS= \
-	mus2midi.o \
-	midi.o \
-	mus.o
+C_SOURCES = $(wildcard *.c)
+HEADERS = ${wildcard *.h}
+OBJS = ${C_SOURCES:.c=.o}
 
 all: mus2midi
 
 clean:
-	rm -f *.o *~
+	rm -f *.o
 	rm mus2midi
 
 mus2midi: $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o mus2midi
 
-%.o: %.c %.h
+%.o: %.c ${HEADERS}
 	$(CC) $(CFLAGS) -c $< -o $@
