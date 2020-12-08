@@ -88,7 +88,7 @@ event_t read_event(mus_t *mus) {
     uint8_t event_info = mus_getc(mus);
 
     // Parse the info
-    ev.last = ((0x80 & event_info) >> 7) ? true : false;
+    ev.last = (0x80 & event_info) ? true : false;
     ev.type = (0x70 & event_info) >> 4;
     ev.channel = 0x0F & event_info;
 
@@ -99,14 +99,8 @@ event_t read_event(mus_t *mus) {
             break;
         case PLAY_NOTE:
             ev.note = mus_getc(mus);
-            short vol_flag = (0x80 & ev.note);
-            ev.note &= 0x7F;
-            // NOTE: If there's no volume flag, use volume of prev
-            // note on channel, signified with -1
-            if (vol_flag) {
-                ev.vol = (0x7F & mus_getc(mus));
-            } else {
-                ev.vol = -1;
+            if (ev.note & 0x80) {
+                ev.vol = (mus_getc(mus) & 0x7F);
             }
             break;
         case PITCH_BEND:
