@@ -109,7 +109,7 @@ event_t read_event(mus_t *mus) {
                 ev.vol = -1;
             }
             break;
-        case PITCH_BLEND:
+        case PITCH_BEND:
             ev.bend = mus_getc(mus);
             break;
         case SYSTEM_EVENT:

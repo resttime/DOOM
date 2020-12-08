@@ -22,7 +22,7 @@ typedef struct __attribute__((__packed__)) mus_t {
 typedef enum EVENT_TYPE {
     RELEASE_NOTE,
     PLAY_NOTE,
-    PITCH_BLEND,
+    PITCH_BEND,
     SYSTEM_EVENT,
     CONTROLLER,
     END_OF_MEASURE,
