@@ -14,12 +14,10 @@ midi_t* mus_to_midi(const char *file) {
 
     printf("Size of MUS data is: %d\n\n", mus->size);
 
-
     uint8_t channel_vol[16] = {0};
     int num = 0;
     event_t ev;
     while (1) {
-
         printf("Event: %d\n", num, ev.pos);
         ev = read_event(mus);
         printf("Last: %d, Type: %d, Channel: %d\n", ev.last, ev.type, ev.channel);
@@ -129,7 +127,6 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Usage: %s file\n", argv[0]);
     }
 
-    // test_play();
     midi_t *midi = mus_to_midi("D_E1M1.mus");
     test_play_midi(midi);
     midi_free(midi);

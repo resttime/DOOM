@@ -42,13 +42,7 @@ void test_load() {
     midi_write(midi, "test.mid");
     midi_t *test = midi_load("test.mid");
 
-    if (memcmp(midi, test,
-               4*sizeof(uint8_t) + // header_id
-               sizeof(uint32_t) + // chunklen
-               3*sizeof(uint16_t) + // format, ntracks, tickdiv
-               4*sizeof(uint8_t) + // track_id
-               sizeof(uint32_t) //track_len
-            ) == 0) {
+    if (memcmp(midi, test, MIDI_HEADER_SIZE) == 0) {
         printf("Headers same!\n");
         if (memcmp(midi->data, test->data, ntohl(midi->track_len)) == 0) {
             printf("Data same!\n");
@@ -104,17 +98,7 @@ void test_play_midi(midi_t *midi) {
         printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
     }
 
-    int size =
-        4*sizeof(uint8_t) + // header_id
-        sizeof(uint32_t) + // chunklen
-        3*sizeof(uint16_t) + // format, ntracks, tickdiv
-        4*sizeof(uint8_t) + // track_id
-        sizeof(uint32_t); //track_len
-        
-    uint8_t m[size+ntohl(midi->track_len)];
-    memcpy(m, midi, size);
-    memcpy(m+size, midi->data, ntohl(midi->track_len));
-    SDL_RWops *mem = SDL_RWFromConstMem(m, size+ntohl(midi->track_len));
+    SDL_RWops *mem = SDL_RWFromConstMem(midi, MIDI_HEADER_SIZE+ntohl(midi->track_len));
     if (mem == NULL) {
         printf( "Could not SDL_RW: %s\n", SDL_GetError() );
     }

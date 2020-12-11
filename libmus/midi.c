@@ -20,9 +20,7 @@ midi_t *midi_create() {
     // Track
     memcpy(&midi->track_id, "MTrk", 4);
     midi->track_len = htons(0);
-    midi->data = malloc(htonl(1024*100)); // Allocate 100 KB to cover enough
 
-    midi->offset = 22; // Where the data starts
     midi->pos = 0;
 
     return midi;
@@ -43,14 +41,8 @@ midi_t *midi_load(const char* file) {
         goto error;
     }
 
-    // Read midi info
-    if (fread(midi,
-              4*sizeof(uint8_t) + // header_id
-              sizeof(uint32_t) + // chunklen
-              3*sizeof(uint16_t) + // format, ntracks, tickdiv
-              4*sizeof(uint8_t) + // track_id
-              sizeof(uint32_t), // track_len
-              1, fp) != 1) {
+    // Read midi header
+    if (fread(midi, MIDI_HEADER_SIZE, 1, fp) != 1) {
         fprintf(stderr, "Could not read midi info\n");
         goto error;
     }
@@ -63,13 +55,11 @@ midi_t *midi_load(const char* file) {
         goto error;
     }
 
-    // Allocate memory for data
-    midi->data = malloc(ntohl(midi->track_len));
-    if (midi->data == NULL) {
-        fprintf(stderr, "Could not allocate memory\n");
+    // Read midi data
+    if (MIDI_DATA_BUFFER_SIZE < ntohl(midi->track_len)) {
+        fprintf(stderr, "Midi data too large! Increase size of buffer\n");
         goto error;
     }
-    // Read midi data
     if (fread(midi->data, ntohl(midi->track_len), 1, fp) != 1) {
         if (feof(fp)) {
             fprintf(stderr, "Could not read data, reached end of file\n");
@@ -79,7 +69,6 @@ midi_t *midi_load(const char* file) {
         goto error;
     }
 
-    midi->offset = 22; // For midi converted from mus
     midi->pos = 0;
 
     fclose(fp);
@@ -93,7 +82,6 @@ error:
 
 void midi_free(midi_t *midi) {
     if (midi != NULL) {
-        if (midi->data != NULL) free(midi->data);
         free(midi);
     }
 }
@@ -105,33 +93,19 @@ void midi_write(midi_t *midi, const char *file) {
         fprintf(stderr, "Could not open file: %s\n", file);
     }
 
-    // Write midi info
-    if (fwrite(midi,
-               4*sizeof(uint8_t) + // header_id
-               sizeof(uint32_t) + // chunklen
-               3*sizeof(uint16_t) + // format, ntracks, tickdiv
-               4*sizeof(uint8_t) + // track_id
-               sizeof(uint32_t), //track_len
-               1, fp) != 1) {
-        fprintf(stderr, "Could not write midi info\n");
-        fclose(fp);
-    }
-
-    // Write midi track data
-    if (ntohl(midi->track_len) > 0 &&
-        fwrite(midi->data, ntohl(midi->track_len), 1, fp) != 1) {
-        fprintf(stderr, "Could not write midi track\n");
-        fclose(fp);
+    // Write midi
+    if (fwrite(midi, MIDI_HEADER_SIZE+ntohl(midi->track_len), 1, fp) != 1) {
+        fprintf(stderr, "Could not write midi\n");
     }
     fclose(fp);
 }
 
 void midi_data_putc(midi_t *midi, uint8_t c) {
-    if (ntohl(midi->track_len)+1 >= 100*1024) {
+    if (ntohl(midi->track_len)+1 >= MIDI_DATA_BUFFER_SIZE) {
         fprintf(stderr, "Exceeded maximum size of the midi data buffer\n");
         return;
     }
-    ((uint8_t *)midi->data)[midi->pos++] = c;
+    midi->data[midi->pos++] = c;
     midi->track_len = htonl(ntohl(midi->track_len)+1);
 
 }

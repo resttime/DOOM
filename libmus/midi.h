@@ -23,11 +23,10 @@ typedef struct __attribute__((__packed__)) midi_t {
     // Track
     uint8_t track_id[4]; // MTrk
     uint32_t track_len; // Size of track data (Located at 18 for, MUS)
-    void *data; // The data
+    uint8_t data[MIDI_DATA_BUFFER_SIZE]; // The data
 
     // User defined
-    uint32_t offset; // Where start of data is, 22 for MUS
-    uint32_t pos; // Position with respect to the offset
+    uint32_t pos; // Position with respect to the offset 22
 } midi_t;
 
 midi_t *midi_create();
