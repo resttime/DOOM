@@ -1,6 +1,15 @@
 #ifndef MIDI_H
 #define MIDI_H
 
+#define MIDI_HEADER_SIZE                        \
+    4*sizeof(uint8_t) +                         \
+    sizeof(uint32_t) +                          \
+    3*sizeof(uint16_t) +                        \
+    4*sizeof(uint8_t) +                         \
+    sizeof(uint32_t)
+
+#define MIDI_DATA_BUFFER_SIZE 96*1024
+
 // MIDI is big-endian!
 
 typedef struct __attribute__((__packed__)) midi_t {
