@@ -426,8 +426,10 @@ void I_InitGraphics(void)
     }
     firsttime = false;
 
-    // Intialize the SDL
-    SDL_Init(SDL_INIT_VIDEO);
+    // Intialize the SDL video
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        fprintf(stderr, "SDL_INIT could not initialize video\n");
+    };
 
     // Set the interrupt signal to quit
     signal(SIGINT, (void (*)(int)) I_Quit);
