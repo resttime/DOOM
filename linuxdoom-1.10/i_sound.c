@@ -43,6 +43,9 @@ rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 #include <time.h>
 #include <signal.h>
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
+
 #include "z_zone.h"
 
 #include "i_system.h"
@@ -827,8 +830,22 @@ I_InitSound()
 // Still no music done.
 // Remains. Dummies.
 //
-void I_InitMusic(void)		{ }
-void I_ShutdownMusic(void)	{ }
+void I_InitMusic(void)
+{
+    // Init SDL audio
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        fprintf(stderr, "SDL_INIT could not initialize audio\n");
+    }
+
+    //Initialize SDL_mixer
+    if(Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0) {
+        printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
+    }
+}
+void I_ShutdownMusic(void)
+{
+    Mix_Quit();
+}
 
 static int	looping=0;
 static int	musicdies=-1;

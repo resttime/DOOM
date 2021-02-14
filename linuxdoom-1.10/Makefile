@@ -9,7 +9,7 @@ CC=  gcc  # gcc or g++
 CFLAGS=-g -Wall -DNORMALUNIX # -DUSEASM
 INC=
 LDFLAGS=
-LIBS=-lnsl -lm -lSDL2
+LIBS=-lnsl -lm -lSDL2 -lSDL2_mixer
 
 # subdirectory for objects
 O=linux
