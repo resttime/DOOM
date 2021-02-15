@@ -6,7 +6,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
+#include "mus.h"
 #include "midi.h"
+#include "mus2midi.h"
 
 void test_putdelay() {
     midi_t *midi = midi_create();
@@ -76,7 +78,7 @@ void test_play_midi_file() {
     }
     Mix_Music *m = Mix_LoadMUS("test.mid");
     if (m == NULL) {
-        printf("Mix_LoadMUS(\"...\"): %s\n", Mix_GetError());   
+        printf("Mix_LoadMUS(\"...\"): %s\n", Mix_GetError());
     }
     Mix_PlayMusic(m, -1);
     SDL_Delay(10000);
@@ -104,7 +106,7 @@ void test_play_midi(midi_t *midi) {
     }
     Mix_Music *music = Mix_LoadMUS_RW(mem, 0);
     if (music == NULL) {
-        printf("Mix_LoadMUS(\"...\"): %s\n", Mix_GetError());   
+        printf("Mix_LoadMUS(\"...\"): %s\n", Mix_GetError());
     }
 
     // Play the music
@@ -116,4 +118,18 @@ void test_play_midi(midi_t *midi) {
     music = NULL;
     Mix_Quit();
     SDL_Quit();
+}
+
+
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s file\n", argv[0]);
+    }
+
+    test_mus_load();
+    return 0;
+    midi_t *midi = mus_to_midi("D_E1M1.mus");
+    test_play_midi(midi);
+    midi_free(midi);
+    return 0;
 }
