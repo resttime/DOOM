@@ -107,8 +107,11 @@ void test_play_midi(midi_t *midi) {
         printf("Mix_LoadMUS(\"...\"): %s\n", Mix_GetError());   
     }
 
-    Mix_PlayMusic(music, -1);
-    SDL_Delay(10000);
+    // Play the music
+    Mix_PlayMusic(music, 1);
+    while (Mix_PlayingMusic() == 1) {}
+
+    // Cleanup
     Mix_FreeMusic(music);
     music = NULL;
     Mix_Quit();
