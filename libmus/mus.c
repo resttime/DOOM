@@ -4,7 +4,7 @@
 
 #include "mus.h"
 
-mus_t *mus_load(const char* file) {
+mus_t *mus_loadf(const char* file) {
     // Open file
     FILE *fp = fopen(file, "r");
     if (fp == NULL) {

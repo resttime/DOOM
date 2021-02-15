@@ -19,7 +19,7 @@ void test_putdelay() {
     midi_data_putdelay(midi, 0x4000);
     midi_write(midi, "test.mid");
 
-    midi_t *test = midi_load("test.mid");
+    midi_t *test = midi_loadf("test.mid");
     uint8_t results[] = {
         0x00,
         0x40,
@@ -38,9 +38,9 @@ void test_putdelay() {
 }
 
 void test_load() {
-    midi_t *midi = midi_load("D_E1M1.mid");
+    midi_t *midi = midi_loadf("D_E1M1.mid");
     midi_write(midi, "test.mid");
-    midi_t *test = midi_load("test.mid");
+    midi_t *test = midi_loadf("test.mid");
 
     if (memcmp(midi, test, MIDI_HEADER_SIZE) == 0) {
         printf("Headers same!\n");

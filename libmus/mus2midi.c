@@ -8,7 +8,7 @@
 
 midi_t* mus_to_midi(const char *file) {
     // TODO: Change to cmdline arg
-    mus_t *mus = mus_load(file);
+    mus_t *mus = mus_loadf(file);
     midi_t *midi = midi_create();
     midi_data_putc(midi, 0x00); // First delay in midi is 0x00
 

@@ -26,7 +26,7 @@ midi_t *midi_create() {
     return midi;
 }
 
-midi_t *midi_load(const char* file) {
+midi_t *midi_loadf(const char* file) {
     // Open file
     FILE *fp = fopen(file, "r");
     if (fp == NULL) {

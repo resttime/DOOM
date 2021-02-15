@@ -30,7 +30,7 @@ typedef struct __attribute__((__packed__)) midi_t {
 } midi_t;
 
 midi_t *midi_create();
-midi_t *midi_load(const char *file);
+midi_t *midi_loadf(const char *file);
 void midi_free(midi_t *midi);
 void midi_write(midi_t* midi, const char *file);
 void midi_data_putc(midi_t *midi, uint8_t c);

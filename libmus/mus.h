@@ -43,7 +43,7 @@ typedef struct event_t {
     uint8_t val;
 } event_t;
 
-mus_t* mus_load(const char* file);
+mus_t* mus_loadf(const char* file);
 void mus_free(mus_t *mus);
 uint8_t mus_getc(mus_t *mus);
 event_t read_event(mus_t *mus);
